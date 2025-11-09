@@ -1,4 +1,4 @@
-import { Events } from "discord.js";
+import { Events, MessageFlags } from "discord.js";
 
 //이 코드가 있어야 슬래쉬 명령어 실행되는 이벤트 처리 가능(= 슬래쉬 명령어 행동 가능)
 export default {
