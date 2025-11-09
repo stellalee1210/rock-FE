@@ -2,10 +2,19 @@ import fs from "fs"; //events 폴더나 commands 폴더를 fs로 읽어와야 �
 import path from "path"; //폴더나 파일 경로가 있어야 가져오기 가능
 import { pathToFileURL } from "url";
 import "dotenv/config";
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import {
+  Client,
+  Events,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  Collection,
+} from "discord.js";
 import pool from "./db/database.js";
 
 const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.CLIENT_ID;
+const guildId = process.env.GUILD_ID;
 
 // 새로운 클라이언트 인스턴스 생성 = 봇
 const client = new Client({
@@ -15,6 +24,9 @@ const client = new Client({
     GatewayIntentBits.GuildVoiceStates,
   ],
 });
+
+//client(봇)에게 슬래쉬 명령어들을 저장할 수 있는 Collection 달아주기
+client.commands = new Collection();
 
 //봇 실행시 처음 한 번만 실행하는 코드
 client.once(Events.ClientReady, async (readyClient) => {
@@ -28,6 +40,48 @@ client.once(Events.ClientReady, async (readyClient) => {
 
 //__dirname은 CJS에서는 지원했지만 esm에서는 하지 않기 때문에 별도로 선언해줘야 함
 const __dirname = import.meta.dirname;
+//commands 파일경로
+const commandsPath = path.join(__dirname, "commands");
+//events 파일 내부에 .js로 끝나는 파일 전부 읽어서 저장
+const commandFilesDir = await fs.promises.readdir(commandsPath);
+const commandFiles = commandFilesDir.filter((file) => file.endsWith(".js"));
+
+const commands = [];
+
+//commands 파일에서 읽은 슬래쉬 명령어들을 위의 commands 배열에 저장
+for (const file of commandFiles) {
+  const filePath = path.join(commandsPath, file);
+  const fileURL = pathToFileURL(filePath);
+
+  const commandModule = await import(fileURL);
+  const command = commandModule.default;
+  if ("data" in command && "execute" in command) {
+    commands.push(command.data.toJSON()); // 명령어 배포(등록)
+    client.commands.set(command.data.name, command); //execute(실행) 함수 client(봇)에게 저장. 이 부분이 있어야 실행 가능
+  } else {
+    console.log(
+      `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+    );
+  }
+}
+
+// REST 모듈을 통해 명령어를 등록하는 과정
+const rest = new REST().setToken(token);
+(async () => {
+  try {
+    console.log(`${commands.length}개의 [슬래쉬 명령어] 초기화 중 . . .`);
+    //put을 통해 현재 시점의 슬래쉬 명령어 리프레싱
+    const data = await rest.put(
+      Routes.applicationGuildCommands(clientId, guildId),
+      { body: commands }
+    );
+    console.log(`${data.length}개의 [슬래쉬 명령어]를 무사히 등록했습니다!`);
+  } catch (error) {
+    console.error(error);
+  }
+})();
+
+//이벤트 핸들러 등록
 //events 파일경로
 const eventsPath = path.join(__dirname, "events");
 //events 파일 내부에 .js로 끝나는 파일 전부 읽어서 저장
