@@ -17,24 +17,26 @@ export default {
 
       // 출석 체크
       const today = new Date();
-      const isMorning = today.getHours() < 9;
+      // 9시 이전 출석시 아침 출석으로 인정
+      const isMorning = today.getHours() <= 6 || today.getHours() < 9;
 
       const result = await pool.query(attendanceQueries.registerAttendance, [
         userId,
         isMorning,
       ]);
 
+      // 통계 업데이트
       if (result.rows.length > 0) {
-        // 통계 업데이트
+        // 새 기록인 경우
         await pool.query(attendanceQueries.updateStats, [userId]);
 
-        await interaction.reply(`출석 완료!`);
+        await interaction.reply(`출석이 완료 됐습니다요!`);
       } else {
-        await interaction.reply(`오늘은 이미 출석하셨습니다.`);
+        await interaction.reply(`마님, 오늘 건 이미 찍었슈!`);
       }
     } catch (error) {
       console.error('출석 오류', error);
-      await interaction.reply('출석 처리 중 오류가 발생했습니다.');
+      await interaction.reply('이런, 뭔가 꼬였는갑네… 출석이 안 됐습니다요!');
     }
   },
 };
