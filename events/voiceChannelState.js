@@ -22,7 +22,7 @@ export default {
 };
 
 const setUserInfo = (oldState, newState, client) => {
-  client.studyUsers = new Map();
+  if (client.studyUsers === undefined) client.studyUsers = new Map();
   userInfo.userDisplayName = newState.member.user.displayName; //사용자 별명
   userInfo.userId = newState.member.user.id; //사용자 id 번호
   userInfo.curState = newState;
@@ -48,18 +48,19 @@ const checkStudy = (client) => {
   //만약 client의 studyUsersMap에 해당 사용자의 인스턴스가 저장되어 있지 않다면, 새로 만들어서 추가하고
   //만약 저장이 되어 있다면 해당 value를 꺼내와서 할당
   const user = studyUsersMap.has(userInfo.userId)
-    ? studyUsersMap.values(userInfo.userId)
+    ? studyUsersMap.get(userInfo.userId)
     : new User(userInfo);
 
   //현재 State의 입/퇴장 구분
   if (userInfo.curChannelId === studyChannelId) {
+    //입장 시간 저장
+    user.startTimer();
     //입장 메세지 전송
     sendMessage(userInfo.userDisplayName + CHANNEL_ENTER_MSG);
   }
-  if (
-    userInfo.curChannelId === null ||
-    userInfo.curChannelId !== userInfo.prevChannelId
-  ) {
+  if (userInfo.curChannelId !== studyChannelId) {
+    user.endTimer();
+    user.saveTime();
     //퇴장 메세지 전송
     sendMessage(userInfo.userDisplayName + CHANNEL_EXIT_MSG);
   }
