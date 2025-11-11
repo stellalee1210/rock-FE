@@ -60,9 +60,11 @@ const checkStudy = (client) => {
   }
   if (userInfo.curChannelId !== studyChannelId) {
     user.endTimer();
-    user.saveTime();
     //퇴장 메세지 전송
     sendMessage(userInfo.userDisplayName + CHANNEL_EXIT_MSG);
+
+    user.saveTime();
+    user.sendDM(userInfo.curState);
   }
   studyUsersMap.set(userInfo.userId, user);
 };

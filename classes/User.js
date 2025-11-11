@@ -6,6 +6,7 @@ export class User {
   #studyTimeStart;
   #studyTimeEnd;
   #studyTime;
+  #totalStudyTime;
   constructor(data) {
     this.#userDisplayName = data.userDisplayName;
     this.#userId = data.userId;
@@ -14,6 +15,7 @@ export class User {
     this.#studyTimeStart = 0;
     this.#studyTimeEnd = 0;
     this.#studyTime = 0;
+    this.#totalStudyTime = 0;
   }
 
   #getDate() {
@@ -33,7 +35,20 @@ export class User {
   }
 
   saveTime() {
-    this.#studyTime += this.#calculateStudyTime();
+    this.#studyTime = this.#calculateStudyTime();
+    this.#totalStudyTime += this.#studyTime;
+  }
+
+  sendDM(state) {
+    const membersMap = state.guild.members.cache;
+    const member = membersMap.get(this.#userId);
+    member.send(
+      `${this.#userDisplayName} 마님 방금 ${
+        this.#studyTime
+      }초 공부하셨습니다요!\n오늘 총 공부 시간은 ${
+        this.#totalStudyTime
+      }초 여유!!`
+    );
   }
 
   #calculateStudyTime() {
