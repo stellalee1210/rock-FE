@@ -27,11 +27,11 @@ export class User {
   }
 
   startTimer() {
-    this.#studyTimeStart = new Date().getTime();
+    this.#studyTimeStart = Date.now();
   }
 
   endTimer() {
-    this.#studyTimeEnd = new Date().getTime();
+    this.#studyTimeEnd = Date.now();
   }
 
   saveTime() {
