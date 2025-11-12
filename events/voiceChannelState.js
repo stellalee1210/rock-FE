@@ -8,11 +8,22 @@ export default {
   name: Events.VoiceStateUpdate,
   //client는 voiceStateUpdate를 일으킨 member의 VoiceState를 반환
   execute(oldState, newState) {
-    const client = newState.client;
-    //음성채널 위치의 변동이 있는 경우 (= 입/퇴장)
-    if (oldState.channelId !== newState.channelId) {
-      const user = getStudyUser(newState, client);
-      checkStudy(client, user); //현재 사용자의 입/퇴장 상태에 따라 공부시간 측정/종료
+    try {
+      //스터디를 진행하는 음성채널에 변동이 있는 경우 (= 입/퇴장)
+      if (
+        oldState.channelId === studyChannelId ||
+        newState.channelId === studyChannelId
+      ) {
+        const client = newState.client;
+        const user = getStudyUser(newState, client);
+        checkStudy(client, user); //현재 사용자의 입/퇴장 상태에 따라 공부시간 측정/종료
+      }
+    } catch (error) {
+      sendMessage(
+        newState,
+        `${newState.member.user.displayName} 마님.. 뭐가 잘못됐슈 다시 한 번 해보셔`
+      );
+      console.log(error.message);
     }
   },
 };
@@ -23,32 +34,33 @@ const getStudyUser = (newState, client) => {
   //만약 저장이 되어 있다면 해당 value를 꺼내와서 할당
   const studyUsersMap = client.studyUsers;
   const userId = newState.member.user.id;
-  return studyUsersMap.has(userId)
-    ? studyUsersMap.get(userId)
-    : new User(newState);
+  if (studyUsersMap.has(userId)) {
+    const user = studyUsersMap.get(userId);
+    user.updateState(newState);
+    return user;
+  }
+  return new User(newState);
 };
 
 const checkStudy = (client, user) => {
   const curChannelId = user.curState.channelId;
-  //현재 State의 입/퇴장 구분
+  const curState = user.curState;
   if (curChannelId === studyChannelId) {
-    //입장 시간 저장
+    //입장
     user.startTimer();
-    //입장 메세지 전송
     const msg = user.makeMessage(CHANNEL_ENTER_MSG);
-    sendMessage(user, msg);
-  }
-  if (curChannelId !== studyChannelId) {
+    sendMessage(curState, msg);
+  } else {
+    //퇴장
     user.endTimer();
-    //퇴장 메세지 전송
     const msg = user.makeMessage(CHANNEL_EXIT_MSG);
-    sendMessage(user, msg);
+    sendMessage(curState, msg);
   }
-  client.studyUsers.set(user.userId, user);
+  client.studyUsers.set(user.userId, user); //client에 해당 사용자의 상태 업데이트
 };
 
-const sendMessage = (user, msg) => {
-  const channelCollection = user.curState.guild.channels.cache; //서버에 존재하는 모든 채널을 Collection 형태로 리턴
+const sendMessage = (curState, msg) => {
+  const channelCollection = curState.guild.channels.cache; //서버에 존재하는 모든 채널을 Collection 형태로 리턴
   //Collection을 순회하여 동일한 voice Channel id를 가진 객체를 찾은 뒤, 해당 객체.send('메세지') 해야 함
   const voiceChannel = channelCollection.get(studyChannelId);
   voiceChannel.send(msg);

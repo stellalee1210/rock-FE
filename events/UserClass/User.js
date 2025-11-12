@@ -1,31 +1,45 @@
+import { StudyTimeCountError } from "../../error/Errors.js";
+
 export class User {
   #newState;
+
   #userId;
   #userDisplayName;
+
   #isStudying;
-  #yymmdd;
   #studyTimeStart;
   #studyTimeEnd;
   #studyTime;
   #totalStudyTime;
+  #yymmdd;
+
   constructor(newState) {
+    this.#initializeUser(newState);
+  }
+
+  #initializeUser(newState) {
     this.#newState = newState;
     this.#userDisplayName = newState.member.user.displayName;
     this.#userId = newState.member.user.id;
-    this.#isStudying = true;
+    this.#isStudying = false;
     this.#yymmdd = this.#getDate();
     this.#studyTimeStart = 0;
     this.#studyTimeEnd = 0;
     this.#studyTime = 0;
     this.#totalStudyTime = 0;
   }
-
   #getDate() {
     const today = new Date();
     const year = today.getFullYear() % 100;
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const date = today.getDate();
     return `${year}${month}${date}`;
+  }
+
+  updateState(newState) {
+    this.#newState = newState;
+    this.#userDisplayName = newState.member.user.displayName;
+    this.#userId = newState.member.user.id;
   }
 
   get userId() {
@@ -46,15 +60,23 @@ export class User {
   }
 
   endTimer() {
-    this.#studyTimeEnd = Date.now();
-    this.#isStudying = false;
-    this.#saveTime();
-    this.#sendDM();
+    if (this.#isStudying && this.#studyTimeStart > 0) {
+      this.#studyTimeEnd = Date.now();
+      this.#isStudying = false;
+      this.#saveTime();
+      this.#sendDM();
+      return;
+    }
+    throw new StudyTimeCountError();
   }
 
   #saveTime() {
-    this.#studyTime = this.#calculateStudyTime();
-    this.#totalStudyTime += this.#studyTime;
+    if (this.#studyTimeStart > 0 && this.#studyTimeEnd > 0) {
+      this.#studyTime = this.#calculateStudyTime();
+      this.#totalStudyTime += this.#studyTime;
+      return;
+    }
+    throw new StudyTimeCountError();
   }
 
   #sendDM() {
