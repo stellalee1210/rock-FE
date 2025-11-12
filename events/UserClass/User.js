@@ -1,4 +1,4 @@
-import { StudyTimeCountError } from "../../error/Errors.js";
+import { StudyTimeCountError, SendingDMFailError } from "../../error/Errors.js";
 
 export class User {
   #newState;
@@ -80,15 +80,19 @@ export class User {
   }
 
   #sendDM() {
-    const membersMap = this.#newState.guild.members.cache;
-    const member = membersMap.get(this.#userId);
-    member.send(
-      `${this.#userDisplayName} 마님 방금 ${
-        this.#studyTime
-      }초 공부하셨습니다요!\n오늘 총 공부 시간은 ${
-        this.#totalStudyTime
-      }초 여유!!`
-    );
+    try {
+      const membersMap = this.#newState.guild.members.cache;
+      const member = membersMap.get(this.#userId);
+      member.send(
+        `${this.#userDisplayName} 마님 방금 ${
+          this.#studyTime
+        }초 공부하셨습니다요!\n오늘 총 공부 시간은 ${
+          this.#totalStudyTime
+        }초 여유!!`
+      );
+    } catch (error) {
+      new SendingDMFailError(this.#newState, error);
+    }
   }
 
   #calculateStudyTime() {
