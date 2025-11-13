@@ -19,7 +19,7 @@ export async function registerAttendance(
     currentTime,
     isMorning,
   ]);
-  return result.rows.length > 0;
+  return result.rows.length > 0; // boolean 리턴하도록
 }
 
 // 메인 함수
@@ -47,7 +47,7 @@ async function checkYesterdayAttendance(userId, yesterday) {
     attendedYesterday = true;
   }
 
-  return attendedYesterday;
+  return attendedYesterday; // return 값 boolean
 }
 
 // 현재 통계 가져오기
@@ -60,7 +60,7 @@ async function getCurrentStats(userId) {
     total_attendance: 0,
     streak_days: 0,
     max_streak: 0,
-  };
+  }; // 통계가 없으면 0으로 가져오기
 
   return stats;
 }
@@ -72,7 +72,7 @@ function calculateNewStats(stats, attendedYesterday) {
 
   if (attendedYesterday) {
     updateStreak = stats.streak_days + 1;
-  }
+  } // 어제 기록이 있으면 +1
 
   const updateMaxStreak = Math.max(stats.max_streak, updateStreak);
 
@@ -90,7 +90,7 @@ async function saveStats(userId, newStats) {
     newStats.total,
     newStats.streak,
     newStats.maxStreak,
-  ]);
+  ]); // 계산된 통계를 통해서 업데이트
 }
 
 // 출석 통계 조회
@@ -101,7 +101,7 @@ export async function getStats(userId) {
 
   if (result.rows.length === 0) {
     return null;
-  }
+  } // 통계 없는지 확인 위해 null return
 
   return result.rows[0];
 }
