@@ -1,4 +1,5 @@
 import { StudyTimeCountError, SendingDMFailError } from "../../error/Errors.js";
+import { saveStudyTimeToDB } from "./utils/saveStudyTimeToDB.js";
 
 export class User {
   #newState;
@@ -11,7 +12,7 @@ export class User {
   #studyTimeEnd;
   #studyTime;
   #totalStudyTime;
-  #yymmdd;
+  #date;
 
   constructor(newState) {
     this.#initializeUser(newState);
@@ -22,7 +23,7 @@ export class User {
     this.#userDisplayName = newState.member.user.displayName;
     this.#userId = newState.member.user.id;
     this.#isStudying = false;
-    this.#yymmdd = this.#getDate();
+    this.#date = this.#getDate();
     this.#studyTimeStart = 0;
     this.#studyTimeEnd = 0;
     this.#studyTime = 0;
@@ -30,10 +31,10 @@ export class User {
   }
   #getDate() {
     const today = new Date();
-    const year = today.getFullYear() % 100;
+    const year = today.getFullYear();
     const month = (today.getMonth() + 1).toString().padStart(2, "0");
     const date = today.getDate();
-    return `${year}${month}${date}`;
+    return `${year}-${month}-${date}`;
   }
 
   updateState(newState) {
@@ -63,17 +64,26 @@ export class User {
     if (this.#isStudying && this.#studyTimeStart > 0) {
       this.#studyTimeEnd = Date.now();
       this.#isStudying = false;
-      this.#saveTime();
+      this.#saveToDB();
       this.#sendDM();
       return;
     }
     throw new StudyTimeCountError();
   }
 
-  #saveTime() {
+  #saveToDB() {
     if (this.#studyTimeStart > 0 && this.#studyTimeEnd > 0) {
       this.#studyTime = this.#calculateStudyTime();
       this.#totalStudyTime += this.#studyTime;
+      const startTime = new Date(this.#studyTimeStart);
+      const endTime = new Date(this.#studyTimeEnd);
+      saveStudyTimeToDB(
+        this.#userId,
+        this.#date,
+        startTime,
+        endTime,
+        this.#totalStudyTime
+      );
       return;
     }
     throw new StudyTimeCountError();
@@ -96,9 +106,6 @@ export class User {
   }
 
   #calculateStudyTime() {
-    const studiedSeconds = Math.floor(
-      (this.#studyTimeEnd - this.#studyTimeStart) / 1000
-    );
-    return studiedSeconds;
+    return this.#studyTimeEnd - this.#studyTimeStart;
   }
 }
