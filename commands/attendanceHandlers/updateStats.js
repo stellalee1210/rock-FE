@@ -1,22 +1,6 @@
 import pool from '../../db/database.js';
 import { ATTENDANCE_QUERIES } from '../../db/queries/attendance.js';
 
-// 출석 등록
-export async function registerAttendance(
-  userId,
-  today,
-  currentTime,
-  isMorning
-) {
-  const result = await pool.query(ATTENDANCE_QUERIES.REGISTER_ATTENDANCE, [
-    userId,
-    today,
-    currentTime,
-    isMorning,
-  ]);
-  return result.rows.length > 0; // boolean 리턴하도록
-}
-
 // 메인 함수
 export async function updateAttendanceStats(userId, yesterday) {
   const attendedYesterday = await checkYesterdayAttendance(userId, yesterday);

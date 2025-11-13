@@ -1,4 +1,4 @@
-import { registerAttendance, updateAttendanceStats } from './attendanceData.js';
+import { updateAttendanceStats } from './updateStats.js';
 import {
   getKoreanTime,
   formatKSTDate,
@@ -21,14 +21,14 @@ export async function processAttendance(userId, username) {
   const isMorning = isMorningTime();
 
   // 출석 등록
-  const isNewAttendance = await registerAttendance(
+  const result = await pool.query(ATTENDANCE_QUERIES.REGISTER_ATTENDANCE, [
     userId,
     today,
     currentTime,
-    isMorning
-  );
+    isMorning,
+  ]);
 
-  if (!isNewAttendance) {
+  if (result.rows.length === 0) {
     return { alreadyChecked: true };
   } // 중복 출석이면 alreadyChecked를 true로 return -> 내부 확인 후에 출력하도록
 

@@ -1,5 +1,5 @@
 import { ATTENDANCE } from '../../constants/messages.js';
-import { getStats } from './attendanceData.js';
+import { getStats } from './updateStats.js';
 
 export async function getAttendanceStats(interaction) {
   try {
