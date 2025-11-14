@@ -1,7 +1,8 @@
 import { StudyTimeCountError, SendingDMFailError } from "../../error/Errors.js";
-import { saveStudyTimeToDB } from "./utils/saveStudyTimeToDB.js";
 import { UNIT } from "../../constants/units.js";
-import { formatStudyTime } from "./utils/formatTime.js";
+import pool from "../../db/database.js";
+import { STUDY_TIME_QUERIES } from "../../../db/queries/studyTime.js";
+import { SaveStudyTimeToDBFailError } from "../../../error/Errors.js";
 
 export class User {
   #newState;
@@ -31,6 +32,7 @@ export class User {
     this.#studyTime = 0;
     this.#totalStudyTime = 0;
   }
+
   #getDate() {
     const today = new Date();
     const year = today.getFullYear();
@@ -62,40 +64,48 @@ export class User {
     this.#isStudying = true;
   }
 
-  endTimer() {
+  async endTimer() {
     if (this.#isStudying && this.#studyTimeStart > 0) {
       this.#studyTimeEnd = Math.floor(Date.now() / UNIT.MS2SEC); //ms -> sec으로 변환해서 저장
       this.#isStudying = false;
-      this.#saveToDB();
-      this.#sendDM();
+      this.#saveStudyTime();
+      await this.#sendDM();
       return;
     }
     throw new StudyTimeCountError();
   }
 
-  #saveToDB() {
+  async #saveStudyTime() {
     if (this.#studyTimeStart > 0 && this.#studyTimeEnd > 0) {
       this.#studyTime = this.#calculateStudyTime();
       this.#totalStudyTime += this.#studyTime;
-      const startTime = new Date(this.#studyTimeStart);
-      const endTime = new Date(this.#studyTimeEnd);
-      saveStudyTimeToDB(
-        this.#newState,
-        this.#userId,
-        this.#date,
-        startTime,
-        endTime,
-        this.#totalStudyTime
-      );
-      return;
+      await this.#saveToDB();
     }
     throw new StudyTimeCountError();
+  }
+
+  async #saveToDB() {
+    try {
+      const formattedStartTime = new Date(this.#studyTimeStart);
+      const formattedEndTime = new Date(this.#studyTimeEnd);
+      await pool.query(STUDY_TIME_QUERIES.SAVE_STUDY_TIME, [
+        this.#userId,
+        this.#date,
+        formattedStartTime,
+        formattedEndTime,
+        this.#totalStudyTime,
+      ]);
+    } catch (error) {
+      throw new SaveStudyTimeToDBFailError(this.#newState, this.#userId, error);
+    }
   }
 
   #sendDM() {
     try {
-      const formattedStudyTime = formatStudyTime(this.#studyTime);
-      const formattedTotalStudyTime = formatStudyTime(this.#totalStudyTime);
+      const formattedStudyTime = this.#formatStudyTime(this.#studyTime);
+      const formattedTotalStudyTime = this.#formatStudyTime(
+        this.#totalStudyTime
+      );
 
       const membersMap = this.#newState.guild.members.cache;
       const member = membersMap.get(this.#userId);
@@ -108,6 +118,14 @@ export class User {
       throw new SendingDMFailError(this.#newState, error);
     }
   }
+
+  //초단위로 측정된 시간을 시분초 단위로 변환
+  #formatStudyTime = (time) => {
+    const hours = Math.floor(time / UNIT.SEC2HOUR);
+    const minutes = Math.floor((time % UNIT.SEC2HOUR) / UNIT.SEC2MINUTE);
+    const seconds = time % UNIT.SEC2MINUTE;
+    return `${hours}시 ${minutes}분 ${seconds}초`;
+  };
 
   #calculateStudyTime() {
     return this.#studyTimeEnd - this.#studyTimeStart;
