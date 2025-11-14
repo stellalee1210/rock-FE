@@ -13,6 +13,7 @@ export class User {
 
   #userId;
   #userDisplayName;
+  #membersMap;
 
   #isStudying;
   #studyTimeStart;
@@ -29,6 +30,7 @@ export class User {
     this.#newState = newState;
     this.#userDisplayName = newState.member.user.displayName;
     this.#userId = newState.member.user.id;
+    this.#membersMap = newState.guild.members.cache;
     this.#isStudying = false;
     this.#date = formatKSTDate(new Date());
     this.#studyTimeStart = 0;
@@ -104,14 +106,15 @@ export class User {
         this.#totalStudyTime
       );
 
-      const membersMap = this.#newState.guild.members.cache;
-      const member = membersMap.get(this.#userId);
+      const member = this.#membersMap.get(this.#userId);
       member.send(
         `${
           this.#userDisplayName
         } 마님 방금 ${formattedStudyTime} 공부하셨습니다요!\n오늘 총 공부 시간은 ${formattedTotalStudyTime} 여유!!`
       );
     } catch (error) {
+      const member = this.#membersMap.get(this.#userId);
+      member.send(`${ERROR_MESSAGES.ERROR_STUDY_TIME_DBSAVE_FAIL}`);
       throw new SendingDMFailError(this.#newState, error);
     }
   }

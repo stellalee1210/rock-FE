@@ -9,6 +9,7 @@ export class StudyTimeCountError extends BotError {
 
 export class SendingDMFailError extends BotError {
   constructor(state, error) {
+    super(ERROR_MESSAGES.ERROR_SENDING_MESSAGE_FAIL);
     console.log(
       `[${state.member.user.displayName}] 사용자에게 ${ERROR_MESSAGES.ERROR_SENDING_MESSAGE_FAIL}\n${error.message}`
     );
@@ -17,6 +18,7 @@ export class SendingDMFailError extends BotError {
 
 export class SendingChannelMessageFailError extends BotError {
   constructor(state, error) {
+    super(ERROR_MESSAGES.ERROR_SENDING_MESSAGE_FAIL);
     console.log(
       `[${state.channelId}] 채널에 ${ERROR_MESSAGES.ERROR_SENDING_MESSAGE_FAIL}\n${error.message}`
     );
@@ -24,10 +26,8 @@ export class SendingChannelMessageFailError extends BotError {
 }
 
 export class SaveStudyTimeToDBFailError extends BotError {
-  constructor(state, user_id, error) {
-    const membersMap = state.guild.members.cache;
-    const member = membersMap.get(user_id);
-    member.send(`${ERROR_MESSAGES.ERROR_STUDY_TIME_DBSAVE_FAIL}`);
+  constructor(error) {
+    super(ERROR_MESSAGES.ERROR_STUDY_TIME_DBSAVE_FAIL);
     console.log(`DB에 공부시간 저장 실패\n${error.message}`);
   }
 }
