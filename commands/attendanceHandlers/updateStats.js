@@ -18,15 +18,14 @@ async function checkYesterdayAttendance(userId, yesterday) {
     [userId, yesterday]
   );
 
-  let attendedYesterday = false;
   if (
     yesterdayAttendance.rows[0] &&
     yesterdayAttendance.rows[0].attended_yesterday
   ) {
-    attendedYesterday = true;
+    return true;
   }
 
-  return attendedYesterday; // return 값 boolean
+  return false; // return 값 boolean
 }
 
 // 현재 통계 가져오기
