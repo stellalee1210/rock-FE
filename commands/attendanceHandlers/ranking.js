@@ -17,7 +17,7 @@ export async function getAttendanceRanking(interaction) {
       )
       .join('\n');
 
-    await interaction.reply(`출석 순위 \n ${ranking}`);
+    await interaction.reply(`## 🥇 출석 순위 \n ${ranking}`);
   } catch (error) {
     console.error('순위 조회 오류', error);
     await interaction.reply('순위 오류');
