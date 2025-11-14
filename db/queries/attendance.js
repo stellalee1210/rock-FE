@@ -4,35 +4,35 @@ export const ATTENDANCE_QUERIES = {
   // 사용자 등록
   REGISTER_USER: `INSERT INTO users (user_id, username)
   VALUES ($1, $2)
-  ON CONFLICT (user_id) DO UPDATE SET username = $2`,
+  ON CONFLICT (user_id) DO NOTHING -- 기존 유저면 아무것도 안해도 됨`,
 
   // 출석 등록
   REGISTER_ATTENDANCE: `INSERT INTO attendance (user_id, attendance_date, attendance_time, is_morning)
-  VALUES ($1, $2, CURRENT_TIME, $3)
-  ON CONFLICT (user_id, attendance_date) DO NOTHING
+  VALUES ($1, $2, $3, $4) -- 변수로 4개 다 전달 
+  ON CONFLICT (user_id, attendance_date) DO NOTHING -- 기존에 출석했으면 아무것도 안해도 됨
   RETURNING attendance_id`,
 
-  // 통계 업데이트
-  UPDATE_STATS: `
-  WITH yesterday_attendance AS (
-    SELECT EXISTS (
-      SELECT 1 FROM attendance 
-      WHERE user_id = $1 
-      AND attendance_date = CURRENT_DATE - INTERVAL '1 day'
-    ) AS attended_yesterday
-  )
-  INSERT INTO states (user_id, total_attendance, streak_days)
-  VALUES ($1, 1, 1)
-  ON CONFLICT (user_id) DO UPDATE 
-  SET 
-    total_attendance = states.total_attendance + 1,
-    streak_days = CASE 
-      WHEN (SELECT attended_yesterday FROM yesterday_attendance) THEN states.streak_days + 1
-      ELSE 1
-    END,
-    updated_at = NOW()
-`,
+  // 어제 출석 여부 확인
+  CHECK_YESTERDAY: `SELECT EXISTS (
+    SELECT 1 FROM attendance -- attendance 정보 있는지 확인
+    WHERE user_id = $1 AND attendance_date = $2 -- $2는 어제 날짜
+  ) AS attended_yesterday`,
 
-  // 연속 출석일 수 구하기
-  GET_STREAKDAYS: `SELECT streak_days FROM states WHERE user_id=$1`,
+  GET_CURRENT_STATS: `SELECT total_attendance, streak_days, max_streak
+  FROM states
+  WHERE user_id = $1`,
+
+  UPDATE_STATS: `INSERT INTO states (user_id, total_attendance, streak_days, max_streak)
+  VALUES($1, $2, $3, $4)
+  ON CONFLICT(user_id) DO UPDATE -- 기존 유저면
+  SET -- 내용 업데이트
+    total_attendance = $2, 
+    streak_days = $3,
+    max_streak = $4,
+    updated_at = NOW()`,
+
+  // 이번달 통계
+  ATTENDANCE_STATS: `SELECT user_id, total_attendance, streak_days, max_streak
+  FROM states
+  WHERE user_id = $1`,
 };
