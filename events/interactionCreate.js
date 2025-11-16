@@ -1,4 +1,5 @@
-import { Events, MessageFlags } from "discord.js";
+import { Events, MessageFlags } from 'discord.js';
+import { checkAttendance } from '../commands/attendanceHandlers/check.js';
 
 //이 코드가 있어야 슬래쉬 명령어 실행되는 이벤트 처리 가능(= 슬래쉬 명령어 행동 가능)
 export default {
@@ -18,14 +19,19 @@ export default {
       console.error(error);
       if (interaction.replied || interaction.deferred) {
         await interaction.followUp({
-          content: "해당 명령어 실행 중 오류가 발생했습니다!",
+          content: '해당 명령어 실행 중 오류가 발생했습니다!',
           flags: MessageFlags.Ephemeral,
         });
       } else {
         await interaction.reply({
-          content: "해당 명령어 실행 중 오류가 발생했습니다!",
+          content: '해당 명령어 실행 중 오류가 발생했습니다!',
           flags: MessageFlags.Ephemeral,
         });
+      }
+    }
+    if (interaction.isButton()) {
+      if (interaction.customId === 'attendance_check') {
+        await checkAttendance(interaction);
       }
     }
   },
