@@ -13,7 +13,7 @@ export default {
         .addChoices(
           { name: "하루", value: "day" },
           { name: "일주일", value: "week" },
-          { name: "한달", value: "week" }
+          { name: "한 달", value: "month" }
         )
     ),
   async execute(interaction) {
