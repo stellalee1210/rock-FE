@@ -2,14 +2,14 @@ import pool from "../../db/database.js";
 import { STUDY_TIME_QUERIES } from "../../db/queries/studyTimeQueries.js";
 import { getKoreanTime, formatKSTDate } from "../../utils/time.js";
 import { formatStudyTime } from "../../utils/time.js";
+import { STUDYTIME } from "../../constants/messages.js";
 
 export const getStudyTime = async (interaction, range) => {
   const userDisplayName = interaction.member.displayName;
   const todayDate = formatKSTDate(getKoreanTime()); //yyyy-mm-dd 문자열 형식
+  let response = "";
 
   try {
-    let response = "";
-
     if (range === "day") {
       response = await dailyStudyTimeMsg(todayDate, userDisplayName);
     } else if (range === "week") {
@@ -18,10 +18,10 @@ export const getStudyTime = async (interaction, range) => {
       const monthPattern = `${todayDate.substring(0, 7)}%`;
       response = await monthlyStudyTimeMsg(monthPattern, userDisplayName);
     }
-
-    await interaction.reply(response);
   } catch (error) {
-    console.log(error.message);
+    response = STUDYTIME.ERROR_FETCH_DB_DATA;
+  } finally {
+    await interaction.reply(response);
   }
 };
 
@@ -84,9 +84,7 @@ const getWeekStart = (date) => {
 
 const getWeekEnd = (firstDay) => {
   const today = new Date(firstDay);
-  let endDate = new Date(today.setDate(firstDay.getDate() + 6));
-
-  if (firstDay < 0) endDate.setMonth(endDate.getMonth() + 1);
+  let endDate = new Date(today.setDate(firstDay.getDate() + 6)); //월요일 + 6 = 일요일
 
   return endDate;
 };
