@@ -6,13 +6,14 @@ export async function registerMembers(client) {
     const guildId = process.env.GUILD_ID;
 
     const guild = await client.guilds.fetch(guildId);
-
     const members = await guild.members.fetch();
 
+    // for문으로 모든 member들을 등록함
     for (const [id, member] of members) {
       await pool.query(ATTENDANCE_QUERIES.REGISTER_USER, [
         member.id,
         member.displayName,
+        // 닉네임 등록
       ]);
     }
 
