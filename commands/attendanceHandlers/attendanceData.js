@@ -2,9 +2,10 @@ import pool from '../../db/database.js';
 import { ATTENDANCE_QUERIES } from '../../db/queries/attendance.js';
 
 // 현재 통계 가져오기
-export async function getCurrentStats(userId) {
+export async function getCurrentStats(userId, guildId) {
   const currentStats = await pool.query(ATTENDANCE_QUERIES.GET_CURRENT_STATS, [
     userId,
+    guildId,
   ]);
 
   const stats = currentStats.rows[0] || {
@@ -17,10 +18,10 @@ export async function getCurrentStats(userId) {
 }
 
 // 어제 출석했는지 확인
-export async function checkYesterdayAttendance(userId, yesterday) {
+export async function checkYesterdayAttendance(userId, guildId, yesterday) {
   const yesterdayAttendance = await pool.query(
     ATTENDANCE_QUERIES.CHECK_YESTERDAY,
-    [userId, yesterday]
+    [userId, guildId, yesterday]
   );
 
   if (
@@ -34,9 +35,10 @@ export async function checkYesterdayAttendance(userId, yesterday) {
 }
 
 // 통계 업데이트
-export async function saveStats(userId, newStats) {
+export async function saveStats(userId, guildId, newStats) {
   const stats = await pool.query(ATTENDANCE_QUERIES.UPDATE_STATS, [
     userId,
+    guildId,
     newStats.total,
     newStats.streak,
     newStats.maxStreak,

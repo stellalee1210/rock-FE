@@ -7,11 +7,11 @@ import {
 } from './attendanceData.js';
 
 // 메인 함수
-export async function updateAttendanceStats(userId, yesterday) {
+export async function updateAttendanceStats(userId, guildId, yesterday) {
   const attendedYesterday = await checkYesterdayAttendance(userId, yesterday);
   const currentStats = await getCurrentStats(userId);
   const newStats = calculateNewStats(currentStats, attendedYesterday);
-  await saveStats(userId, newStats);
+  await saveStats(userId, guildId, newStats);
 
   return newStats.streak;
 }
