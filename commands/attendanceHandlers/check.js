@@ -6,6 +6,8 @@ export async function checkAttendance(interaction) {
   const username = interaction.member.displayName;
 
   try {
+    await interaction.deferReply();
+
     const result = await processAttendance(userId, username);
     // 출석 등록 및 통계 업데이트
 
@@ -20,7 +22,7 @@ export async function checkAttendance(interaction) {
       `<@${userId}> 마님, 출석이 완료 됐습니다요! ${morning}\n\n` +
       `연속 출석 ${result.streakDays}일 째입니다요!`;
 
-    await interaction.reply(message);
+    await interaction.editReply(message);
   } catch (error) {
     console.error('출석 오류', error);
     await interaction.reply(ATTENDANCE.ERROR_ATTEND);
