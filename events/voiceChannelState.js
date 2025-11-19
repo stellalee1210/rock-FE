@@ -42,9 +42,10 @@ export default {
 };
 
 const getStudyChannelId = async (guildId) => {
-  return pool.query(STUDY_TIME_QUERIES.FETCH_STUDY_CHANNEL_ID, [
+  const queryResult = pool.query(STUDY_TIME_QUERIES.FETCH_STUDY_CHANNEL_ID, [
     guildId.toString(),
   ]);
+  return (await queryResult).rows[0].study_channel_id;
 };
 
 const getStudyUser = (newState, client) => {
