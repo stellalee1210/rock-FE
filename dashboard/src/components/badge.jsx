@@ -1,7 +1,20 @@
+//출석 뱃지
+
 export default function Badge({ text }) {
   return (
-    <span className="inline-block bg-green-500 text-white text-xs px-2 py-1 rounded">
+    <div
+      style={{
+        position: 'absolute',
+        bottom: '4px',
+        right: '4px',
+        backgroundColor: '#e91e63',
+        color: '#fff',
+        borderRadius: '12px',
+        padding: '2px 6px',
+        fontSize: '0.7em',
+      }}
+    >
       {text}
-    </span>
+    </div>
   );
 }
