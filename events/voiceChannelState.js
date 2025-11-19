@@ -1,5 +1,5 @@
 import { Events } from "discord.js";
-import { StudyTimeCountError, NoStudyChannelSaved } from "../error/Errors.js";
+import { StudyTimeCountError } from "../error/Errors.js";
 import { checkStudy } from "./voiceState/studyTimeManager.js";
 import { STUDY_TIME_QUERIES } from "../db/queries/studyTimeQueries.js";
 import { sendMessage2Channel } from "./voiceState/messageManager.js";
