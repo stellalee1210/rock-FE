@@ -10,18 +10,20 @@ export const DBsaveStartTime = async (newState, startTime, date) => {
     newState.guild.id,
   ]);
 };
+import { formatKSTDate } from "../../utils/time.js";
 
-const getStartTime = async (userId, guildId) => {
+const fetchStartTime = async (userId, guildId) => {
   const fetchedStartTime = await pool.query(
     STUDY_TIME_QUERIES.FETCH_START_TIME,
     [userId, guildId]
   );
   return fetchedStartTime.rows[0].start_time;
 };
+
 export const DBsaveEndTime = async (newState, endTime, date) => {
   const userId = newState.member.user.id;
   const guildId = newState.guild.id;
-  const startTime = await getStartTime(userId, guildId);
+  const startTime = await fetchStartTime(userId, guildId);
   const studyTime = Math.floor(
     (endTime.getTime() - startTime.getTime()) / 1000
   );
@@ -33,4 +35,20 @@ export const DBsaveEndTime = async (newState, endTime, date) => {
     studyTime,
     guildId,
   ]);
+};
+
+export const fetchStudyTimeforDM = async (newState) => {
+  const userId = newState.member.user.id;
+  const guildId = newState.guild.id;
+  const date = formatKSTDate(new Date());
+
+  const recentStudyTime = await pool.query(
+    STUDY_TIME_QUERIES.FETCH_RECENT_STUDY_TIME,
+    [userId, guildId]
+  );
+  const dailyStudyTime = await pool.query(
+    STUDY_TIME_QUERIES.FETCH_DAILY_STUDY_TIME,
+    [userId, guildId, date]
+  );
+  return [recentStudyTime, dailyStudyTime];
 };

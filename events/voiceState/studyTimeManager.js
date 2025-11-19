@@ -1,5 +1,5 @@
 import { CHANNEL } from "../../constants/messages.js";
-import { sendMessage2Channel, sendDM } from "./messageManager.js";
+import { sendMessage2Channel, sendDMOfStudyTime } from "./messageManager.js";
 import { formatKSTDate } from "../../utils/time.js";
 import { DBsaveStartTime, DBsaveEndTime } from "./DBManager.js";
 
@@ -16,6 +16,7 @@ export const checkStudy = async (newState, studyChannelId) => {
     await endTimer(newState);
     const msg = userDisplayName + CHANNEL.EXIT_MSG;
     sendMessage2Channel(newState, msg, studyChannelId);
+    await sendDMOfStudyTime(newState);
   }
 };
 
