@@ -9,8 +9,8 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  /* 은은한 그라데이션 */
+  background: linear-gradient(to bottom, #f7ffd2 0%, #c7c4ff 100%);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -28,11 +28,7 @@ a:hover {
 
 body {
   margin: 0;
-  padding: 0; /* 추가 */
-  /* display: flex; */ /* 삭제 또는 주석 */
-  /* flex-direction: column; */ /* 삭제 또는 주석 */
-  /* justify-content: center; */ /* 삭제 또는 주석 */
-  /* align-items: center; */ /* 이게 문제! 삭제 또는 주석 */
+  padding: 0;
   min-width: 320px;
   min-height: 100vh;
   background-color: inherit;

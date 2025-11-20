@@ -20,12 +20,14 @@ export function App() {
         onLogout={() => setIsLoggedIn(false)}
       />
 
-      {/* 메인 콘텐츠 - Header 높이만큼 padding 추가 */}
-      <main>
-        <h1 className="text-2xl mb-4">출석 캘린더</h1>
+      <main className="px-4 pt-[120px] pb-6 md:px-8 lg:px-40">
+        <div className="flex justify-end mb-4">
+          <GuildDropdown />
+        </div>
+
+        <h1 className="text-2xl text-black mb-4">출석 캘린더</h1>
         <div className="space-y-4">
           <CalendarView attendanceDates={attendanceDates} />
-          <GuildDropdown />
         </div>
       </main>
     </>
