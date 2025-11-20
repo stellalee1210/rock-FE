@@ -9,7 +9,13 @@ const Header = ({ isLoggedIn, onLogin, onLogout }) => {
 
       {/* 버튼들 */}
       <div className="flex gap-4">
-        <Button>Contact</Button>
+        <Button
+          onClick={() =>
+            window.open('https://github.com/woowa-discord/rock-FE', '_blank')
+          }
+        >
+          Contact
+        </Button>
         {isLoggedIn ? (
           <Button onClick={onLogout}>로그아웃</Button>
         ) : (
