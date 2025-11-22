@@ -7,6 +7,8 @@
 
   export default function Dashboard (){
     const [serverList, setServerList] = useState([]);
+    const [selectedGuild, setSelectedGuild] = useState(null);
+
       const guildId = '1435586389243854860';
       const userId = '391098361924812800';
       const userName = '유저이름';
@@ -26,11 +28,8 @@
         const guildInfo = async() =>{
           //사용자의 서버 중 돌쇠가 포함된 서버의 목록만을 가져옴
           const userGuildsData = await getGuildInfo(hasFetchedGuild); //data || undefined
-          if(userGuildsData) {
-            const serverNameArray = userGuildsData.map(server=>server.name);
-            setServerList(serverNameArray);
-            console.log("현재 서버 목록 : ", serverNameArray); 
-          }   
+          //값이 있다면 통째로 저장
+          if(userGuildsData) setServerList(userGuildsData);
         }
         guildInfo();      
       }, [])
@@ -45,7 +44,7 @@
             </span>
 
             {/* 오른쪽: Guild Dropdown */}
-            <GuildDropdown serverList = {serverList}/>
+            <GuildDropdown serverList = {serverList} selectedGuild = {selectedGuild} setSelectedGuild ={setSelectedGuild}/>
           </div>
 
           <AttendanceCalendar guildId={guildId} userId={userId} />
