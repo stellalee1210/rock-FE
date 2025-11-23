@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import AttendanceCalendar from './AttendanceCalendar.jsx';
 import { PersonalStatsCard } from './PersonalStatsCard.jsx';
 import { RankingCard } from './RankingCard.jsx';
-import { getTotalStudyTime } from '../database/studyTime.js';
+import { getWeeklyStudyTime } from '../database/studyTime.js';
 
 export default function DashboardContent({ userId, selectedGuild}){
     // mock 데이터
@@ -16,12 +16,13 @@ export default function DashboardContent({ userId, selectedGuild}){
 
     const hasFetchedData = useRef(false);
     useEffect(()=>{
-    const totalStudyTime = async() => {
-        const studyTimeData = await getTotalStudyTime(hasFetchedData, userId, selectedGuild);
-        if(studyTimeData) console.log('studyTimeData : ', studyTimeData);
-    }
+        hasFetchedData.current = false
+        const weeklyStudyTime = async() => {
+            const studyTimeData = await getWeeklyStudyTime(hasFetchedData, userId, selectedGuild);
+            if(studyTimeData) console.log('weekly studyTimeData : ', studyTimeData);
+        }
     
-    totalStudyTime();
+    weeklyStudyTime();
     }, [selectedGuild])
     
     return (
