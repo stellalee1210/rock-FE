@@ -3,7 +3,7 @@ import AttendanceCalendar from './AttendanceCalendar.jsx';
 import { AttendanceRankingCard } from './AttendanceRankingCard.jsx';
 import { StudyRankingCard } from './StudyRankingCard.jsx';
 import { attendanceRanking } from '../database/attendanceRanking.js';
-import { getWeeklyStudyRanking } from '../database/studyTime.js'; // 새로 만든 함수
+import { getWeeklyStudyRanking } from '../database/studyTime.js';
 
 export default function DashboardContent({
   userDisplayName,
@@ -30,7 +30,7 @@ export default function DashboardContent({
     // 공부시간 데이터
     const getStudyData = async () => {
       try {
-        const data = await getWeeklyStudyRanking(selectedGuild); // 서버 전체 유저 이번주 랭킹
+        const data = await getWeeklyStudyRanking(selectedGuild);
         setStudyData(data);
       } catch (err) {
         console.error(err);

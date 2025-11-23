@@ -1,4 +1,8 @@
-// StatCard.jsx
+/**
+ * 순위 카드들의 레이아웃
+ * 공부랭킹, 출석랭킹에 사용
+ */
+
 export function StatCard({ title, children }) {
   return (
     <div
