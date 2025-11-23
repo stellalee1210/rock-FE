@@ -17,14 +17,18 @@ export function StudyRankingCard({ ranking }) {
               backgroundColor: '#f9f9f9',
               boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
               fontSize: '15px',
+              gap: '70px',
             }}
           >
-            <span>{index + 1}위</span>
-            <span>{item.username}</span>
-            <span>{item.hours}시간</span>
+            <span style={{ width: '40px', fontWeight: 700 }}>
+              {index + 1}위
+            </span>
+            <span style={{ flex: 1 }}>{item.username}</span>
+            <span style={{ width: '80px', textAlign: 'right' }}>
+              {item.studyTime}
+            </span>
           </motion.div>
         ))}
       </div>

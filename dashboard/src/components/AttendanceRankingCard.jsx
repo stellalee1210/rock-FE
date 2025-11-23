@@ -15,16 +15,22 @@ export function AttendanceRankingCard({ ranking }) {
               padding: '12px 15px',
               borderRadius: '8px',
               backgroundColor: '#f9f9f9',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
               display: 'flex',
-              justifyContent: 'space-between',
               alignItems: 'center',
               fontSize: '15px',
+              gap: '60px',
             }}
           >
-            <span>{index + 1}위</span>
-            <span>{item.username}</span>
-            <span>{item.days}일</span>
+            <span
+              style={{ width: '40px', marginRight: '20px', fontWeight: 700 }}
+            >
+              {index + 1}위
+            </span>
+            <span style={{ flex: 1 }}>{item.username}</span>
+            <span style={{ width: '60px', textAlign: 'right' }}>
+              {item.max_streak}일
+            </span>
           </motion.div>
         ))}
       </div>
