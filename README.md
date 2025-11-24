@@ -128,9 +128,13 @@
 ![discord.js](https://img.shields.io/badge/discord.js-5865F2?logo=discord&logoColor=fff&style=for-the-badge)
 ![node-schedule](https://img.shields.io/badge/node--schedule-FF4136?logo=node.js&logoColor=fff&style=for-the-badge)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000&style=for-the-badge)
-![ReactDOM](https://img.shields.io/badge/ReactDOM-61DAFB?logo=react&logoColor=000&style=for-the-badge)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff&style=for-the-badge)
 ![React Calendar](https://img.shields.io/badge/React%20Calendar-FF6F61?logo=react&logoColor=fff&style=for-the-badge)
+
+### 스타일 & UI
+
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?logo=tailwindcss&logoColor=fff&style=for-the-badge)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-0055FF?logo=framer&logoColor=fff&style=for-the-badge)
 
 ### 데이터베이스
 
