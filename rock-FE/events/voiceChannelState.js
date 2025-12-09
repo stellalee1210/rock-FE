@@ -1,9 +1,9 @@
-import { Events } from "discord.js";
-import { StudyTimeCountError } from "../error/Errors.js";
-import { checkStudy } from "./voiceState/studyTimeManager.js";
-import { STUDY_TIME_QUERIES } from "../db/queries/studyTimeQueries.js";
-import { sendMessage2Channel } from "./voiceState/messageManager.js";
-import pool from "../db/database.js";
+import { Events } from 'discord.js';
+import { StudyTimeCountError } from '../error/Errors.js';
+import { checkStudy } from './voiceState/studyTimeManager.js';
+import { STUDY_TIME_QUERIES } from '../db/queries/studyTimeQueries.js';
+import { sendMessage2Channel } from './voiceState/messageManager.js';
+import pool from '../db/database.js';
 
 export default {
   name: Events.VoiceStateUpdate,
@@ -15,9 +15,18 @@ export default {
       //스터디 채널이 활성화 되어 있지 않다면 패스
       if (studyChannelId === 0) return;
       //스터디를 진행하는 음성채널에 변동이 있는 경우 (= 입/퇴장)
+      const isJoiningChannel =
+        oldState.channelId !== studyChannelId &&
+        newState.channelId === studyChannelId;
+      const isLefvingChannel =
+        oldState.channelId === studyChannelId &&
+        newState.channelId !== studyChannelId;
       const isTargetChannel =
         oldState.channelId === studyChannelId ||
         newState.channelId === studyChannelId;
+
+      if (!isJoiningChannel && !isLefvingChannel) return;
+      //입퇴장 아니면 패스
 
       if (isTargetChannel) await checkStudy(newState, studyChannelId); //현재 사용자의 입/퇴장 상태에 따라 공부시간 측정/종료
     } catch (error) {
