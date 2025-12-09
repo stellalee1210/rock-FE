@@ -18,14 +18,14 @@ export default {
       const isJoiningChannel =
         oldState.channelId !== studyChannelId &&
         newState.channelId === studyChannelId;
-      const isLefvingChannel =
+      const isLeavingChannel =
         oldState.channelId === studyChannelId &&
         newState.channelId !== studyChannelId;
       const isTargetChannel =
         oldState.channelId === studyChannelId ||
         newState.channelId === studyChannelId;
 
-      if (!isJoiningChannel && !isLefvingChannel) return;
+      if (!isJoiningChannel && !isLeavingChannel) return;
       //입퇴장 아니면 패스
 
       if (isTargetChannel) await checkStudy(newState, studyChannelId); //현재 사용자의 입/퇴장 상태에 따라 공부시간 측정/종료
